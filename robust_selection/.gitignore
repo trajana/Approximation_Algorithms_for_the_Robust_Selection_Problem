@@ -1,1 +1,11 @@
+# JetBrains / PyCharm
 .idea/
+*.iml
+
+# Virtual environments
+.venv/
+venv/
+
+# Python cache
+__pycache__/
+*.pyc
