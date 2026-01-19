@@ -1,6 +1,7 @@
 # JetBrains / PyCharm
 robust_selection/.idea/
 *.iml
+.idea/
 
 # Virtual environments
 .venv/
