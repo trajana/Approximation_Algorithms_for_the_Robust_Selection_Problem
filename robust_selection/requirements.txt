@@ -1,0 +1,14 @@
+# requirements.txt
+# Tested with Python 3.12
+
+# Core numerical library
+numpy>=1.24
+
+# Plotting
+matplotlib>=3.7
+
+# Optimization solver (Gurobi requires separate installation + license)
+gurobipy>=10.0
+
+# Used by utils.py
+pandas>=2.0
