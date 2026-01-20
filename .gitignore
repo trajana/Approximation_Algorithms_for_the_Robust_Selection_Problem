@@ -1,17 +1,14 @@
 # JetBrains / PyCharm
-robust_selection/.idea/
-*.iml
 .idea/
+*.iml
 
 # Virtual environments
 .venv/
 venv/
 
-.results/
-
 # Python cache
 __pycache__/
 *.pyc
 
-.idea/
-.venv/
+# Generated results
+results/
