@@ -16,6 +16,11 @@ from midpoint import solve_midpoint
 from worst_case_p_item import solve_worst_case_p_item
 from primal_rounding import solve_primal_rounding
 from primal_dual_rounding import solve_primal_dual_with_lp
+from dual_approach import solve_dual_approach
+from primal_dual_rounding_opt_w import (solve_opt_w_then_select_once,
+                                        solve_opt_w_then_select_adaptive_remember, solve_opt_w_ntimes_then_select_adaptive_remember,
+                                        solve_opt_w_ntimes_then_select_adaptive_remember, solve_two_branches_smallest_wi,
+                                        solve_two_branches_biggest_wi)
 from utils import (get_fixed_costs, get_random_costs, dprint_costs, cost_matrix_to_dict,
                    dprint_all_results_from_pkl)
 
@@ -28,6 +33,10 @@ ALGORITHM_DISPATCH = {
         "algorithm": "Primal-Dual Rounding",
         "function": solve_primal_dual_with_lp
     },
+    "dual": {
+        "algorithm": "Dual Approach",
+        "function": solve_dual_approach
+    },
     "midpoint": {
         "algorithm": "Midpoint Method",
         "function": solve_midpoint
@@ -35,6 +44,30 @@ ALGORITHM_DISPATCH = {
     "worst_case_p_item": {
         "algorithm": "Worst-Case per Item",
         "function": solve_worst_case_p_item
+    },
+    "opt_w": {
+        "algorithm": "Optimize w",
+        "function": solve_opt_w_then_select_once
+    },
+    "opt_w_remember": {
+        "algorithm": "Optimize iteratively (remember)",
+        "function": solve_opt_w_then_select_adaptive_remember
+    },
+    # "opt_w_n_remember_rob_obj": {
+    #     "algorithm": "Optimize n times iteratively (remember, min robust obj)",
+    #     "function": solve_opt_w_ntimes_then_select_adaptive_remember_rob_obj
+    # },
+    "opt_w_n_remember": {
+        "algorithm": "Optimize n times iteratively (remember)",
+        "function": solve_opt_w_ntimes_then_select_adaptive_remember
+    },
+    "solve_two_branches_smallest_wi": {
+        "algorithm": "Branch by smallest wi",
+        "function": solve_two_branches_smallest_wi
+    },
+    "solve_two_branches_biggest_wi": {
+        "algorithm": "Branch by biggest wi",
+        "function": solve_two_branches_biggest_wi
     }
 }
 
@@ -48,12 +81,20 @@ p: int | None = None
 k: int | None = None
 
 # Base data
-ALGORITHMS = ["primal", "primal_dual", "midpoint", "worst_case_p_item"]  # Choose algorithms that should
-# be run. Available: "primal_minmax", "primal_dual_minmax", "midpoint", "worst_case_p_item"
-var_param = "p"  # x-axis for the plot, can be "n" or "k" or "p"
+ALGORITHMS = [
+    "primal", "primal_dual", "dual", "midpoint", "worst_case_p_item",
+    "opt_w",
+    "opt_w_remember",
+    #"opt_w_n_remember_rob_obj",
+    #"opt_w_n_remember",
+    "solve_two_branches_smallest_wi",
+    "solve_two_branches_biggest_wi"
+]
+# Choose algorithms that should be run.
+# Available: "primal_minmax", "primal_dual_minmax", "midpoint", "worst_case_p_item"
+var_param = "n"  # x-axis for the plot, can be "n" or "k" or "p"
 if var_param == "n":
-    var_values = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42, 44, 46, 48, 50, 52,
-                  54, 56, 58, 60, 62, 64, 66, 68, 70]
+    var_values = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42, 44, 46, 48, 50, 52, 54, 56, 58, 60, 62, 64, 66, 68, 70]
     fixed_k = 5
     fixed_p = None  # p = n//2, so no need to set it explicitly
 elif var_param == "k":
@@ -63,9 +104,9 @@ elif var_param == "k":
 elif var_param == "p":
     fixed_n = 70
     fixed_k = 5
-    var_values = list(range(2, fixed_n, 2))  # p in steps of 2 from 2 to n-2
+    var_values = [1] + list(range(2, fixed_n, 2))  # p in steps of 2 from 2 to n-2 (plus 1)
 num_runs = 100  # Number of runs for the loop
-COST_MODE = "random"    # Options: "random", "fixed", "reproduce"
+COST_MODE = "reproduce"    # Options: "random", "fixed", "reproduce"
 c_range = 100  # Range for random costs [0, c_range]
 PLOT = True  # Set True to enable plotting
 DEBUG = False  # Set True to enable debug prints
@@ -261,6 +302,34 @@ if __name__ == "__main__":
                         "flat_costs": flat_costs,
                     })
 
+                elif algorithm == "dual":
+                    print("\n--- Dual Approach ---")
+                    c_hat, x_opt, obj_val_dual_lp, obj_val_dual_nom = result
+                    dprint(f"Selected items: {x_opt}")
+                    dprint(f"Objective value: {obj_val_dual_nom:.2f}")
+
+                    # Metrics calculations
+                    ratio_dual_opt = obj_val_dual_nom / obj_val_exact if obj_val_exact != 0 else math.nan
+                    dprint(f"Approximation ratio: {ratio_dual_opt:.2f}")
+                    approximation_guarantee = k
+
+                    # Store results
+                    all_results.append({
+                        "algorithm": algorithm,
+                        "varying_param": a,
+                        "p_label": p_label,
+                        "n": n,
+                        "p": p,
+                        "k": k,
+                        "run": run + 1,
+                        "obj_exact": obj_val_exact,
+                        "obj_val_dual_nom": obj_val_dual_nom,
+                        "approximation_guarantee": approximation_guarantee,
+                        "ratio_alg_opt": ratio_dual_opt,
+                        "x_opt": x_opt,
+                        "flat_costs": flat_costs,
+                    })
+
                 elif algorithm == "midpoint":
                     print("\n--- Midpoint Method ---")
                     costs_av, x_av, obj_val_av = result
@@ -315,6 +384,182 @@ if __name__ == "__main__":
                         "flat_costs": flat_costs,
                     })
 
+                elif algorithm == "opt_w":
+                    print("\n--- LP-opt-w (solve LP, then select p smallest w*) ---")
+                    t_star, beta_star, w_star, x_opt_w, obj_val_opt_w = result
+
+                    # Metrics calculations
+                    dprint(f"Objective value: {obj_val_opt_w:.2f}")
+                    ratio_optw_opt = obj_val_opt_w / obj_val_exact if obj_val_exact != 0 else math.nan
+                    approximation_guarantee = (1.0 / t_star) if t_star > 0 else math.nan
+                    dprint(f"Approximation ratio (ALG/OPT): {ratio_optw_opt:.2f}")
+
+                    # Store results
+                    all_results.append({
+                        "algorithm": algorithm,
+                        "varying_param": a,
+                        "p_label": p_label,
+                        "n": n,
+                        "p": p,
+                        "k": k,
+                        "run": run + 1,
+                        "obj_val_opt_w": obj_val_opt_w,
+                        "approximation_guarantee": approximation_guarantee,
+                        "ratio_alg_opt": ratio_optw_opt,
+                        "t_star": float(t_star),
+                        "beta_star": [float(x) for x in beta_star],
+                        "x_vector_opt_w": x_opt_w,
+                        "flat_costs": flat_costs,
+                    })
+
+                elif algorithm == "opt_w_remember":
+                    chosen, x_opt_w, obj_val_opt_w, t_hist, beta_hist = result
+                    ratio = obj_val_opt_w / obj_val_exact if obj_val_exact != 0 else math.nan
+                    # guarantee: use t from the FIRST LP only
+                    t0 = float(t_hist[0]) if (t_hist and t_hist[0] is not None) else math.nan
+                    if math.isfinite(t0) and t0 > 0.0:
+                        approximation_guarantee = 1.0 / t0
+                    else:
+                        approximation_guarantee = math.nan
+
+                    all_results.append({
+                        "algorithm": algorithm,
+                        "varying_param": a,
+                        "p_label": p_label,
+                        "n": n, "p": p, "k": k, "run": run + 1,
+                        "obj_exact": obj_val_exact,
+                        "obj_val_opt_w": obj_val_opt_w,
+                        "ratio_alg_opt": ratio,
+                        "approximation_guarantee": approximation_guarantee,
+                        "chosen": chosen,
+                        "x_vector_opt_w": x_opt_w,
+                        "t_hist": [float(x) for x in t_hist],
+                        "beta_hist": [[float(y) for y in b] for b in beta_hist],
+                        "flat_costs": flat_costs,
+                    })
+
+                elif algorithm == "opt_w_n_remember_rob_obj":
+                    print("\n--- N-times (remember): choose by min robust objective ---")
+                    chosen, x_opt_w, obj_val_opt_w, hist = result
+                    ratio = obj_val_opt_w / obj_val_exact if obj_val_exact != 0 else math.nan
+
+                    # guarantee: use t0 from the BASELINE LP only
+                    t0 = math.nan
+                    if hist and hist[0].get("baseline", False):
+                        t0 = float(hist[0].get("t0", math.nan))
+
+                    if math.isfinite(t0) and t0 > 0.0:
+                        approximation_guarantee = 1.0 / t0
+                    else:
+                        approximation_guarantee = math.nan
+
+                    all_results.append({
+                        "algorithm": algorithm,
+                        "varying_param": a,
+                        "p_label": p_label,
+                        "n": n, "p": p, "k": k, "run": run + 1,
+                        "obj_exact": obj_val_exact,
+                        "obj_val_opt_w": obj_val_opt_w,
+                        "ratio_alg_opt": ratio,
+                        "approximation_guarantee": approximation_guarantee,
+                        "chosen": chosen,
+                        "x_vector_opt_w": x_opt_w,
+                        "hist": hist,
+                        "flat_costs": flat_costs,
+                    })
+
+                elif algorithm == "opt_w_n_remember":
+                    chosen, x_opt_w, obj_val_opt_w, hist = result
+                    ratio = obj_val_opt_w / obj_val_exact if obj_val_exact != 0 else math.nan
+                    # guarantee: use t from the BASELINE LP only (first entry)
+                    t0 = math.nan
+                    if hist:
+                        h0 = hist[0]
+                        # support different keys depending on how you store it
+                        if isinstance(h0, dict):
+                            if h0.get("baseline") and h0.get("t0") is not None:
+                                t0 = float(h0["t0"])
+                            elif h0.get("t_star") is not None:
+                                t0 = float(h0["t_star"])
+
+                    if math.isfinite(t0) and t0 > 0.0:
+                        approximation_guarantee = 1.0 / t0
+                    else:
+                        approximation_guarantee = math.nan
+
+                    all_results.append({
+                        "algorithm": algorithm,
+                        "varying_param": a,
+                        "p_label": p_label,
+                        "n": n, "p": p, "k": k, "run": run + 1,
+                        "obj_exact": obj_val_exact,
+                        "obj_val_opt_w": obj_val_opt_w,
+                        "ratio_alg_opt": ratio,
+                        "approximation_guarantee": approximation_guarantee,
+                        "chosen": chosen,
+                        "x_vector_opt_w": x_opt_w,
+                        "hist": hist,  # ist schon eine Liste von dicts
+                        "flat_costs": flat_costs,
+                    })
+
+
+                elif algorithm == "solve_two_branches_smallest_wi":
+                    print("\n--- Two-Branch: smallest w_i ---")
+                    chosen, x_vec, obj_val, info = result
+                    ratio = obj_val / obj_val_exact if obj_val_exact != 0 else math.nan
+                    t_chosen = float(info["t_chosen"])
+                    approx_guarantee = (1.0 / t_chosen) if t_chosen > 0 else math.inf
+
+                    all_results.append({
+                        "algorithm": algorithm,
+                        "varying_param": a,
+                        "p_label": p_label,
+                        "n": n, "p": p, "k": k, "run": run + 1,
+                        "obj_exact": obj_val_exact,
+                        "obj_val_branch": obj_val,
+                        "ratio_alg_opt": ratio,
+                        "approximation_guarantee": approx_guarantee,
+                        "t0": float(info["t0"]),
+                        "t_in": float(info["t_in"]),
+                        "t_out": float(info["t_out"]),
+                        "t_chosen": float(info["t_chosen"]),
+                        "chosen_branch": info["chosen_branch"],
+                        "i_star": int(info["i_star"]),
+                        "w_i_star": float(info["w_i_star"]),
+                        "x_vector_branch": x_vec,
+                        "chosen": chosen,
+                        "flat_costs": flat_costs,
+                    })
+
+
+                elif algorithm == "solve_two_branches_biggest_wi":
+                    print("\n--- Two-Branch: biggest w_i ---")
+                    chosen, x_vec, obj_val, info = result
+                    ratio = obj_val / obj_val_exact if obj_val_exact != 0 else math.nan
+                    t_chosen = float(info["t_chosen"])
+                    approx_guarantee = (1.0 / t_chosen) if t_chosen > 0 else math.inf
+
+                    all_results.append({
+                        "algorithm": algorithm,
+                        "varying_param": a,
+                        "p_label": p_label,
+                        "n": n, "p": p, "k": k, "run": run + 1,
+                        "obj_exact": obj_val_exact,
+                        "obj_val_branch": obj_val,
+                        "ratio_alg_opt": ratio,
+                        "approximation_guarantee": approx_guarantee,
+                        "t0": float(info["t0"]),
+                        "t_in": float(info["t_in"]),
+                        "t_out": float(info["t_out"]),
+                        "t_chosen": float(info["t_chosen"]),
+                        "chosen_branch": info["chosen_branch"],
+                        "i_star": int(info["i_star"]),
+                        "w_i_star": float(info["w_i_star"]),
+                        "x_vector_branch": x_vec,
+                        "chosen": chosen,
+                        "flat_costs": flat_costs,
+                    })
+
         # Save results as pickle file
         with open(os.path.join(algo_result_dir, f"all_results.pkl"), "wb") as f:
             pickle.dump(all_results, f)
@@ -333,18 +578,6 @@ if __name__ == "__main__":
                     fixed_n=n, fixed_k=k, c_range=c_range,
                     output_dir=algo_result_dir
                 )
-                # plot_approximation_ratios_primal(
-                #     all_results, num_runs, var_param,
-                #     fixed_n=n, fixed_k=k, c_range=c_range,
-                #     output_dir=algo_result_dir
-                # )
-                # plot_fractional_variable_count(
-                #     all_results, num_runs, var_param,
-                #     fixed_n=fixed_n if var_param != "n" else None,
-                #     fixed_k=fixed_k if var_param != "k" else None,
-                #     c_range=c_range,
-                #     output_dir=algo_result_dir
-                # )
 
             elif algorithm == "primal_dual":
                 plot_approx_ratio_only(
@@ -352,11 +585,13 @@ if __name__ == "__main__":
                     fixed_n=n, fixed_k=k, c_range=c_range,
                     output_dir=algo_result_dir
                 )
-                # plot_approximation_ratios_primaldual(
-                #     all_results, num_runs, var_param,
-                #     fixed_n=n, fixed_k=k, c_range=c_range,
-                #     output_dir=algo_result_dir
-                # )
+
+            elif algorithm == "dual":
+                plot_approx_ratio_only(
+                    all_results, num_runs, var_param,
+                    fixed_n=n, fixed_k=k, c_range=c_range,
+                    output_dir=algo_result_dir
+                )
 
             elif algorithm == "midpoint":
                 plot_approx_ratio_only(
@@ -372,10 +607,68 @@ if __name__ == "__main__":
                     output_dir=algo_result_dir
                 )
 
+            elif algorithm == "opt_w":
+                plot_approx_ratio_only(
+                    all_results, num_runs, var_param,
+                    fixed_n=n, fixed_k=k, c_range=c_range,
+                    output_dir=algo_result_dir
+                )
+
+            elif algorithm == "opt_w_remember":
+                plot_approx_ratio_only(
+                    all_results, num_runs, var_param,
+                    fixed_n=n, fixed_k=k, c_range=c_range,
+                    output_dir=algo_result_dir
+                )
+
+            elif algorithm == "opt_w_n_remember":
+                plot_approx_ratio_only(
+                    all_results, num_runs, var_param,
+                    fixed_n=n, fixed_k=k, c_range=c_range,
+                    output_dir=algo_result_dir
+                )
+
+            elif algorithm == "opt_w_n_remember_rob_obj":
+                plot_approx_ratio_only(
+                    all_results, num_runs, var_param,
+                    fixed_n=n, fixed_k=k, c_range=c_range,
+                    output_dir=algo_result_dir
+                )
+
+            elif algorithm == "solve_two_branches_smallest_wi":
+                plot_approx_ratio_only(
+                    all_results, num_runs, var_param,
+                    fixed_n=n, fixed_k=k, c_range=c_range,
+                    output_dir=algo_result_dir
+                )
+                # NEU:
+                from plot import plot_branch_guarantees
+
+                plot_branch_guarantees(
+                    all_results, num_runs, var_param,
+                    fixed_n=n, fixed_k=k, c_range=c_range,
+                    output_dir=algo_result_dir
+                )
+
+            elif algorithm == "solve_two_branches_biggest_wi":
+                plot_approx_ratio_only(
+                    all_results, num_runs, var_param,
+                    fixed_n=n, fixed_k=k, c_range=c_range,
+                    output_dir=algo_result_dir
+                )
+                # NEU:
+                from plot import plot_branch_guarantees
+
+                plot_branch_guarantees(
+                    all_results, num_runs, var_param,
+                    fixed_n=n, fixed_k=k, c_range=c_range,
+                    output_dir=algo_result_dir
+                )
+
         results_by_alg[algorithm] = all_results
 
     if PLOT and len(results_by_alg) >= 2:
-        from plot import plot_ratio_comp
+        from plot import plot_ratio_comp, plot_guarantee_comp, plot_branch_perf_vs_guarantee
 
         plot_ratio_comp(
             results_by_alg,
@@ -385,3 +678,25 @@ if __name__ == "__main__":
             c_range=c_range,
             output_dir=RESULT_DIR
         )
+
+        plot_guarantee_comp(
+            results_by_alg,
+            num_runs, var_param,
+            fixed_n=fixed_n if var_param != "n" else None,
+            fixed_k=fixed_k if var_param != "k" else None,
+            c_range=c_range,
+            output_dir=RESULT_DIR
+        )
+
+        plot_branch_perf_vs_guarantee(
+            results_by_alg,
+            num_runs,
+            var_param,
+            fixed_n=fixed_n if var_param != "n" else None,
+            fixed_k=fixed_k if var_param != "k" else None,
+            c_range=c_range,
+            output_dir=RESULT_DIR,
+        )
+
+
+

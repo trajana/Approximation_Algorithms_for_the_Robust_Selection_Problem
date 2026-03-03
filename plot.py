@@ -29,7 +29,7 @@ matplotlib.rcParams.update({
     "grid.linewidth": 0.5,
     "grid.alpha": 0.4,
     "axes.grid": True,
-    "figure.figsize": (10, 6)
+    "figure.figsize": (20, 6) # 10 in when legend in fiigure
 })
 
 matplotlib.rcParams["text.latex.preamble"] = r"""
@@ -43,16 +43,32 @@ matplotlib.rcParams["text.latex.preamble"] = r"""
 COL = {
     "primal": "#000000",
     "primal_dual": "#000000",
+    "dual": "#008800",
     "midpoint": "#778899",
     "worst_case_p_item": "#778899",
+    "opt_w": "#2E8B57",
+    "opt_w_remember": "#007700",
+    "opt_w_n_remember": "#0055AA",
+    "opt_w_n_remember_rob_obj": "#663399",
+    "solve_two_branches_smallest_wi": "#770000",
+    "solve_two_branches_biggest_wi": "#AA5500",
 }
 
+
 STYLE = {
-    "primal":              dict(linestyle="-",  marker="o"),
-    "primal_dual":         dict(linestyle="--", marker="s"),
-    "midpoint":            dict(linestyle="-.", marker="D"),
-    "worst_case_p_item":   dict(linestyle=":",  marker="^"),
+    "primal":            dict(linestyle="-",  marker="o"),
+    "primal_dual":       dict(linestyle="--", marker="s"),
+    "dual":              dict(linestyle=":",  marker="v"),
+    "midpoint":          dict(linestyle="-.", marker="D"),
+    "worst_case_p_item": dict(linestyle=":",  marker="^"),
+    "opt_w":             dict(linestyle="--", marker="x"),
+    "opt_w_remember":    dict(linestyle="--", marker=">"),
+    "opt_w_n_remember":  dict(linestyle="-",  marker="^"),
+    "opt_w_n_remember_rob_obj": dict(linestyle="--", marker="p"),
+    "solve_two_branches_smallest_wi": dict(linestyle="--", marker="<"),
+    "solve_two_branches_biggest_wi": dict(linestyle="-", marker="v"),
 }
+
 
 
 def _finite(arr):
@@ -85,9 +101,16 @@ def plot_approx_ratio_only(all_results, num_runs, var_param, fixed_n=None, fixed
     alg_key = all_results[0].get("algorithm", "") if all_results else ""
     label_map = {
         "primal": r"Primal rounding",
-        "primal_dual": r"Primal--dual rounding",
+        "primal_dual": r"Primal-dual rounding",
+        "dual": r"Dual approach",
         "midpoint": r"Midpoint method",
-        "worst_case_p_item": r"Worst-case per item",
+        "worst_case_p_item": r"Worst-case-per-item",
+        "opt_w": r"Solve LP select smallest p",
+        "opt_w_remember": r"Solve LP p times select iteratively",
+        "opt_w_n_remember": r"Solve LP n times each step",
+        "opt_w_n_remember_rob_obj": r"Solve LP n times each step (remember, min robust obj)",
+        "solve_two_branches_smallest_wi": r"Solve LP pick smallest wi - branch",
+        "solve_two_branches_biggest_wi": r"Solve LP pick biggest wi - branch",
     }
     base_label = label_map.get(alg_key, alg_key)
     method_label = rf"{base_label} $\mathrm{{ALG}} / \mathrm{{OPT}}_\mathrm{{IP}}$"
@@ -135,149 +158,6 @@ def plot_approx_ratio_only(all_results, num_runs, var_param, fixed_n=None, fixed
     print(f"Plot saved to {output_plot}")
 
 
-# def plot_approximation_ratios_primal(all_results, num_runs, var_param, fixed_n=None, fixed_k=None, c_range=None,
-#                                      output_dir="results"):
-#     param_suffix = f"_{var_param}" if var_param in {"n", "k", "p"} else ""
-#     output_plot = f"{output_dir}/plot_ratio_{param_suffix}.png"
-#
-#     # Organize data by n
-#     param_to_ratios = {}
-#     param_to_bounds = {}
-#     param_to_guarantee = {}
-#     param_to_alg_div_optlp = {}
-#     for entry in all_results:
-#         param = entry["varying_param"]
-#         ratio = entry["ratio_alg_opt"]
-#         bound = entry["a_posteriori_bound"]
-#         guarantee = entry["approximation_guarantee"]
-#         alg_div_opt_lp = entry["alg_div_opt_lp"]
-#         param_to_ratios.setdefault(param, []).append(ratio)
-#         param_to_bounds.setdefault(param, []).append(bound)
-#         param_to_guarantee.setdefault(param, []).append(guarantee)
-#         param_to_alg_div_optlp.setdefault(param, []).append(alg_div_opt_lp)
-#
-#     # Prepare data for plotting
-#     param_values = sorted(param_to_ratios.keys())
-#     avg_guarantees = [np.mean(param_to_guarantee[p]) for p in param_values]
-#     avg_ratios = [safe_mean(param_to_ratios[p]) for p in param_values]
-#     ci_ratios_95 = [safe_ci95(param_to_ratios[p]) for p in param_values]
-#     avg_bounds = [safe_mean(param_to_bounds[p]) for p in param_values]
-#     ci_bounds_95 = [safe_ci95(param_to_bounds[p]) for p in param_values]
-#     avg_alg_div_optlp = [safe_mean(param_to_alg_div_optlp[p]) for p in param_values]
-#     ci_alg_div_optlp_95 = [safe_ci95(param_to_alg_div_optlp[p]) for p in param_values]
-#
-#     # Plot
-#     plt.figure()
-#     plt.errorbar(param_values, avg_ratios, yerr=ci_ratios_95, fmt='-o', capsize=5,
-#                  label=r"Primal rounding $\mathrm{ALG} / \mathrm{OPT}_{\mathrm{IP}}$ (Ø $\pm$ 95\% CI)",
-#                  color=COL["primal"])
-#     plt.errorbar(param_values, avg_bounds, yerr=ci_bounds_95, fmt='--s', capsize=5,
-#                  label=r"A posteriori bound $1/\tau$ (Ø $\pm$ 95\% CI)", color=COL["aposteriori_tau"])
-#     plt.errorbar(param_values, avg_alg_div_optlp, yerr=ci_alg_div_optlp_95, fmt='-.d', capsize=5,
-#                  label=r"A posteriori bound $\mathrm{ALG} / \mathrm{OPT}_{\mathrm{LP}}$ (Ø $\pm$ 95\% CI)",
-#                  color=COL["aposteriori_lplb"])
-#     plt.plot(param_values, avg_guarantees, ':^', label=r"Approximation guarantee $\min(k, n - p + 1)$",
-#              color=COL["apriori"])
-#     xlabel_map = {
-#         "n": r"Number of items $n$",
-#         "k": r"Number of scenarios $k$",
-#         "p": r"Number of items to select $p$"
-#     }
-#     plt.xlabel(xlabel_map.get(var_param, ""))
-#     plt.ylabel("Approximation ratio and bounds")
-#     plt.yscale('log')
-#     # main_title = f"Approximation Ratio vs. Approximation Guarantees for {titles[criterion]} criterion"
-#     p_label = all_results[0].get("p_label", "") if all_results else ""
-#     subtitle = (
-#             r"(Average over " + str(num_runs) + r" runs $\mid$ "
-#             + (r"$n$=" + str(fixed_n) + ", " if var_param != "n" and fixed_n is not None else "")
-#             + (r"$p$=" + p_label + ", " if var_param != "p" and p_label else "")
-#             + (r"$k$=" + str(fixed_k) + ", " if var_param != "k" and fixed_k is not None else "")
-#             + r"cost range: [1, " + str(c_range) + "])"
-#     )
-#     # plt.title(f"{main_title}\n{subtitle}")
-#     plt.title(subtitle)
-#     plt.xticks(param_values)
-#     plt.legend(loc='upper right', bbox_to_anchor=(1.0, 0.85))
-#     plt.tight_layout()
-#     plt.savefig(output_plot, bbox_inches='tight')
-#     plt.close()
-#     print(f"Plot saved to {output_plot}")
-#
-#
-# def plot_approximation_ratios_primaldual(all_results, num_runs, var_param, fixed_n=None, fixed_k=None,
-#                                          c_range=None, output_dir="results"):
-#     param_suffix = f"_{var_param}" if var_param in {"n", "k", "p"} else ""
-#     output_plot = f"{output_dir}/plot_ratio_primaldual_{param_suffix}.png"
-#
-#     # Organize data by param (e.g., n, k, or p)
-#     param_to_ratios = {}
-#     param_to_guarantee = {}
-#     param_to_a_post = {}
-#     param_to_alg_div_opt_lp = {}
-#
-#     for entry in all_results:
-#         param = entry["varying_param"]
-#         ratio = entry["ratio_alg_opt"]  # or "ratio_primaldual_opt" if that's what you use in results
-#         guarantee = entry["approximation_guarantee"]
-#         a_post = entry["a_posteriori_bound"]
-#         alg_div_opt_lp = entry["alg_div_opt_lp"]
-#         param_to_ratios.setdefault(param, []).append(ratio)
-#         param_to_guarantee.setdefault(param, []).append(guarantee)
-#         param_to_a_post.setdefault(param, []).append(a_post)
-#         param_to_alg_div_opt_lp.setdefault(param, []).append(alg_div_opt_lp)
-#
-#     # Prepare data for plotting
-#     param_values = sorted(param_to_ratios.keys())
-#     avg_guarantees = [np.mean(param_to_guarantee[p]) for p in param_values]
-#     avg_ratios = [safe_mean(param_to_ratios[p]) for p in param_values]
-#     ci_ratios_95 = [safe_ci95(param_to_ratios[p]) for p in param_values]
-#     avg_a_post = [safe_mean(param_to_a_post[p]) for p in param_values]
-#     ci_bounds_95 = [safe_ci95(param_to_a_post[p]) for p in param_values]
-#     avg_alg_div_opt_lp = [safe_mean(param_to_alg_div_opt_lp[p]) for p in param_values]
-#     ci_alg_div_optlp_95 = [safe_ci95(param_to_alg_div_opt_lp[p]) for p in param_values]
-#
-#     # Plot
-#     plt.figure()
-#     plt.errorbar(param_values, avg_ratios, yerr=ci_ratios_95, fmt='-o', capsize=5,
-#                  label=r"Primal-dual rounding $\mathrm{ALG} / \mathrm{OPT}_{\mathrm{IP}}$ (Ø $\pm$ 95\% CI)",
-#                  color=COL["primal_dual"])
-#     plt.plot(param_values, avg_guarantees, ':^',
-#              label=r"Approximation guarantee $k$", color=COL["apriori"])
-#     plt.errorbar(param_values, avg_a_post, yerr=ci_bounds_95, fmt='--s', capsize=5,
-#                  label=r"A posteriori bound $\mathrm{ALG} / \mathrm{LB}_{\mathrm{dual}}$ (Ø $\pm$ 95\% CI)",
-#                  color=COL["aposteriori_tau"])
-#     plt.errorbar(param_values, avg_alg_div_opt_lp, yerr=ci_alg_div_optlp_95, fmt='--s', capsize=5,
-#                  label=r"A posteriori bound $\mathrm{ALG} / \mathrm{OPT}_{\mathrm{LP}}$ (Ø $\pm$ 95\% CI)",
-#                  color=COL["aposteriori_lplb"])
-#
-#     xlabel_map = {
-#         "n": r"Number of items $n$",
-#         "k": r"Number of scenarios $k$",
-#         "p": r"Number of items to select $p$"
-#     }
-#     plt.xlabel(xlabel_map.get(var_param, ""))
-#     plt.ylabel("Approximation ratio and bounds")
-#     plt.yscale('log')
-#     # main_title = f"Approximation Ratio vs. Approximation Guarantees for {titles[criterion]} criterion"
-#     p_label = all_results[0].get("p_label", "") if all_results else ""
-#     subtitle = (
-#             r"(Average over " + str(num_runs) + r" runs $\mid$ "
-#             + (r"$n$=" + str(fixed_n) + ", " if var_param != "n" and fixed_n is not None else "")
-#             + (r"$p$=" + p_label + ", " if var_param != "p" and p_label else "")
-#             + (r"$k$=" + str(fixed_k) + ", " if var_param != "k" and fixed_k is not None else "")
-#             + r"cost range: [1, " + str(c_range) + "])"
-#     )
-#     # plt.title(f"{main_title}\n{subtitle}")
-#     plt.title(subtitle)
-#     plt.xticks(param_values)
-#     plt.legend(loc='upper right', bbox_to_anchor=(1.0, 0.85))
-#     plt.tight_layout()
-#     plt.savefig(output_plot, bbox_inches='tight')
-#     plt.close()
-#     print(f"Plot saved to {output_plot}")
-
-
 def plot_ratio_comp(results_by_alg, num_runs, var_param, fixed_n=None, fixed_k=None, c_range=None,
                     output_dir="results"):
 
@@ -290,9 +170,16 @@ def plot_ratio_comp(results_by_alg, num_runs, var_param, fixed_n=None, fixed_k=N
 
     label_map = {
         "primal": r"Primal rounding",
-        "primal_dual": r"Primal--dual rounding",
+        "primal_dual": r"Primal-dual rounding",
+        "dual": r"Dual approach",
         "midpoint": r"Midpoint method",
-        "worst_case_p_item": r"Worst-case per item",
+        "worst_case_p_item": r"Worst-case-per-item",
+        "opt_w": r"Solve LP select smallest p",
+        "opt_w_remember": r"Solve LP p times select iteratively (remember)",
+        "opt_w_n_remember": r"Solve LP n times each step (remember)",
+        "opt_w_n_remember_rob_obj": r"Solve LP n times each step (remember, min robust obj)",
+        "solve_two_branches_smallest_wi": r"Solve LP pick smallest wi - branch",
+        "solve_two_branches_biggest_wi": r"Solve LP pick biggest wi - branch",
     }
 
     def collect_ratio_by_param(all_results):
@@ -316,10 +203,10 @@ def plot_ratio_comp(results_by_alg, num_runs, var_param, fixed_n=None, fixed_k=N
     # Plot each algorithm
     for alg, d in per_alg.items():
         avg = [safe_mean(d.get(p, [])) for p in all_params]
-        err = [safe_ci95(d.get(p, [])) for p in all_params]
+        #err = [safe_ci95(d.get(p, [])) for p in all_params]
 
         plt.errorbar(
-            all_params, avg, yerr=err, capsize=5,
+            all_params, avg, #yerr=err, capsize=5,
             color=COL.get(alg, "tab:gray"),
             **STYLE.get(alg, dict(linestyle="-", marker="o")),
             label=rf"{label_map.get(alg, alg)}"
@@ -331,7 +218,7 @@ def plot_ratio_comp(results_by_alg, num_runs, var_param, fixed_n=None, fixed_k=N
         "p": r"Number of items to select $p$"
     }
     plt.xlabel(xlabel_map.get(var_param, ""))
-    plt.ylabel(r"Approximation ratio $\mathrm{{ALG}}/\mathrm{{OPT}}_\mathrm{{IP}}$ (Ø $\pm$ 95\% CI)")
+    plt.ylabel(r"Approximation ratio $\mathrm{{ALG}}/\mathrm{{OPT}}_\mathrm{{IP}}$")
 
     # # subtitle
     # any_res = next(iter(results_by_alg.values()))
@@ -345,12 +232,348 @@ def plot_ratio_comp(results_by_alg, num_runs, var_param, fixed_n=None, fixed_k=N
     # )
     #plt.title(subtitle)
 
-    plt.xticks(all_params)
+    plt.xticks(
+        all_params,
+        rotation=45,
+        ha='right',
+        rotation_mode='anchor'  # verhindert das „Wandern“ der Ticks
+    )
+    plt.gcf().set_size_inches(16, 6) #plt.gcf().set_size_inches(12, 6)
+    plt.tight_layout()
 
-    plt.legend(loc="best")
+    # def place_legend(var_param):
+    #     # (x,y) are in axes coordinates: (0,0)=bottom-left, (1,1)=top-right
+    #     if var_param == "n":
+    #         loc = "lower right"
+    #         anchor = (0.98, 0.12)
+    #     elif var_param == "k":
+    #         loc = "upper right"
+    #         anchor = (0.98, 0.63)
+    #     elif var_param == "p":
+    #         loc = "upper right"
+    #         anchor = (0.98, 0.98)
+    #     else:
+    #         loc = "best"
+    #         anchor = None
+    #
+    #     if anchor is None:
+    #         plt.legend(loc=loc, framealpha=0.8)
+    #     else:
+    #         plt.legend(loc=loc, bbox_to_anchor=anchor, framealpha=0.8)
+    # place_legend(var_param)
+    def place_legend(var_param=None):
+        # Legend outside on the right
+        plt.legend(
+            loc="center left",
+            bbox_to_anchor=(1.02, 0.5),  # right of axes, vertically centered
+            framealpha=0.8
+        )
+        # make room for legend
+        plt.gcf().subplots_adjust(right=0.78)
+
+    place_legend(var_param)
+
     plt.tight_layout()
     plt.savefig(output_plot, bbox_inches="tight")
 
     plt.close()
 
     print(f"Plot saved to {output_plot}")
+
+
+def plot_guarantee_comp(results_by_alg, num_runs, var_param, fixed_n=None, fixed_k=None, c_range=None,
+                        output_dir="results"):
+    """
+    Compare approximation guarantees (stored as 'approximation_guarantee') across selected algorithms.
+    Plots average ± 95% CI over runs, grouped by varying_param.
+    """
+    param_suffix = f"_{var_param}" if var_param in {"n", "k", "p"} else ""
+    output_plot = f"{output_dir}/plot_guarantee_comparison{param_suffix}.png"
+
+    if not results_by_alg:
+        print("No results to compare.")
+        return
+
+    # only these algorithms
+    allowed = {
+        "opt_w",
+        "opt_w_remember",
+        "opt_w_n_remember",
+        "opt_w_n_remember_rob_obj",
+        "solve_two_branches_smallest_wi",
+        "solve_two_branches_biggest_wi",
+    }
+    results_by_alg = {alg: res for alg, res in results_by_alg.items() if alg in allowed}
+    if not results_by_alg:
+        print("No matching algorithms for guarantee plot.")
+        return
+
+    label_map = {
+        "opt_w": r"Solve LP select smallest $p$",
+        "opt_w_remember": r"Iterative (remember)",
+        "opt_w_n_remember": r"$n$-probe iterative (remember)",
+        "opt_w_n_remember_rob_obj": r"Solve LP n times each step (remember, min robust obj)",
+        "solve_two_branches_smallest_wi": r"Branch on smallest $w_i$",
+        "solve_two_branches_biggest_wi": r"Branch on biggest $w_i$",
+    }
+
+    def collect_guarantee_by_param(all_results):
+        d = {}
+        for e in all_results:
+            pval = e["varying_param"]
+            g = e.get("approximation_guarantee", math.nan)
+            d.setdefault(pval, []).append(g)
+        return d
+
+    per_alg = {alg: collect_guarantee_by_param(res) for alg, res in results_by_alg.items()}
+    all_params = sorted(set().union(*[set(d.keys()) for d in per_alg.values()]))
+    if not all_params:
+        print("No x-values found.")
+        return
+
+    plt.figure()
+
+    # plot each algorithm with avg ± 95% CI
+    for alg, d in per_alg.items():
+        avg = [safe_mean(d.get(p, [])) for p in all_params]
+        err = [safe_ci95(d.get(p, [])) for p in all_params]
+
+        plt.errorbar(
+            all_params, avg, yerr=err, capsize=5,
+            color=COL.get(alg, "tab:gray"),
+            **STYLE.get(alg, dict(linestyle="-", marker="o")),
+            label=rf"{label_map.get(alg, alg)} (Ø $\pm$ 95\% CI)"
+        )
+
+    xlabel_map = {
+        "n": r"Number of items $n$",
+        "k": r"Number of scenarios $k$",
+        "p": r"Number of items to select $p$"
+    }
+    plt.xlabel(xlabel_map.get(var_param, ""))
+    plt.ylabel(r"Approximation guarantee $1/t$")
+
+    # subtitle like your other plots
+    # try to reuse p_label if present
+    any_res = next(iter(results_by_alg.values()))
+    p_label = any_res[0].get("p_label", "") if any_res else ""
+    subtitle = (
+        r"(Average over " + str(num_runs) + r" runs $\mid$ "
+        + (r"$n$=" + str(fixed_n) + ", " if var_param != "n" and fixed_n is not None else "")
+        + (r"$p$=" + p_label + ", " if var_param != "p" and p_label else "")
+        + (r"$k$=" + str(fixed_k) + ", " if var_param != "k" and fixed_k is not None else "")
+        + r"cost range: [1, " + str(c_range) + "])"
+    )
+    plt.title(subtitle)
+
+    plt.xticks(all_params, rotation=45, ha='right', rotation_mode='anchor')
+    plt.gcf().set_size_inches(16, 6) #plt.gcf().set_size_inches(12, 6)
+    plt.tight_layout()
+
+    # legend placement same logic as before
+    # def place_legend(var_param):
+    #     if var_param == "n":
+    #         loc = "upper left"
+    #         anchor = (0.02, 0.98)
+    #     elif var_param == "k":
+    #         loc = "upper left"
+    #         anchor = (0.02, 0.98)
+    #     elif var_param == "p":
+    #         loc = "upper left"
+    #         anchor = (0.02, 0.98)
+    #     else:
+    #         loc = "best"
+    #         anchor = None
+    #
+    #     if anchor is None:
+    #         plt.legend(loc=loc, framealpha=0.8)
+    #     else:
+    #         plt.legend(loc=loc, bbox_to_anchor=anchor, framealpha=0.8)
+    #
+    # place_legend(var_param)
+
+    def place_legend():
+        # Legend outside on the right
+        plt.legend(
+            loc="center left",
+            bbox_to_anchor=(1.02, 0.5),  # slightly outside right border
+            borderaxespad=0.0,
+            framealpha=0.8
+        )
+
+        # make room for legend
+        plt.gcf().subplots_adjust(right=0.75)
+
+    place_legend()
+
+    plt.tight_layout()
+    plt.savefig(output_plot, bbox_inches="tight")
+    plt.close()
+    print(f"Plot saved to {output_plot}")
+
+def plot_branch_guarantees(all_results, num_runs, var_param,
+                           fixed_n=None, fixed_k=None, c_range=None,
+                           output_dir="results"):
+    """
+    Plottet für einen Branch-Algorithmus (smallest/biggest w_i)
+    die durchschnittliche Garantie 1/t:
+      - Baseline-LP: 1 / t0
+      - Gewählter Branch: 1 / t_chosen
+    über den variierenden Parameter (n, k oder p).
+    """
+    if not all_results:
+        print("No results to plot in plot_branch_guarantees.")
+        return
+
+    param_suffix = f"_{var_param}" if var_param in {"n", "k", "p"} else ""
+    output_plot = f"{output_dir}/plot_branch_guarantees{param_suffix}.png"
+
+    import math
+    param_to_G0 = {}
+    param_to_Gchosen = {}
+    for entry in all_results:
+        param = entry["varying_param"]
+        t0 = float(entry["t0"])
+        t_chosen = float(entry["t_chosen"])
+        G0 = (1.0 / t0) if t0 > 0 else math.nan
+        Gc = (1.0 / t_chosen) if t_chosen > 0 else math.nan
+        param_to_G0.setdefault(param, []).append(G0)
+        param_to_Gchosen.setdefault(param, []).append(Gc)
+
+    param_values = sorted(param_to_G0.keys())
+    if not param_values:
+        print("No x-values found in plot_branch_guarantees.")
+        return
+
+    avg_G0 = [safe_mean(param_to_G0[p]) for p in param_values]
+    ci_G0  = [safe_ci95(param_to_G0[p]) for p in param_values]
+    avg_Gc = [safe_mean(param_to_Gchosen[p]) for p in param_values]
+    ci_Gc  = [safe_ci95(param_to_Gchosen[p]) for p in param_values]
+
+    alg_key = all_results[0].get("algorithm", "")
+    nice_name_map = {
+        "solve_two_branches_smallest_wi": r"Branch on smallest $w_i$",
+        "solve_two_branches_biggest_wi":  r"Branch on biggest $w_i$",
+    }
+    nice_name = nice_name_map.get(alg_key, alg_key)
+
+    fig = plt.figure()
+
+    plt.errorbar(
+        param_values, avg_G0, yerr=ci_G0, capsize=5,
+        linestyle="-", marker="o",
+        label=rf"{nice_name}: baseline guarantee $1/t_0$"
+    )
+
+    plt.errorbar(
+        param_values, avg_Gc, yerr=ci_Gc, capsize=5,
+        linestyle="--", marker="s",
+        label=rf"{nice_name}: chosen branch guarantee $1/t_\mathrm{{chosen}}$"
+    )
+
+    xlabel_map = {
+        "n": r"Number of items $n$",
+        "k": r"Number of scenarios $k$",
+        "p": r"Number of items to select $p$",
+    }
+    plt.xlabel(xlabel_map.get(var_param, ""))
+    plt.ylabel(r"Average guarantee $1/t$")
+
+    p_label = all_results[0].get("p_label", "") if all_results else ""
+    subtitle = (
+        r"(Average over " + str(num_runs) + r" runs $\mid$ "
+        + (r"$n$=" + str(fixed_n) + ", " if var_param != "n" and fixed_n is not None else "")
+        + (r"$p$=" + p_label + ", " if var_param != "p" and p_label else "")
+        + (r"$k$=" + str(fixed_k) + ", " if var_param != "k" and fixed_k is not None else "")
+        + r"cost range: [1, " + str(c_range) + "])"
+    )
+    plt.title(subtitle)
+
+    plt.xticks(param_values)
+    plt.legend()
+    plt.tight_layout()
+
+    plt.savefig(output_plot, bbox_inches="tight")
+    plt.close(fig)
+    print(f"Branch guarantee plot saved to {output_plot}")
+
+def plot_branch_perf_vs_guarantee(results_by_alg, num_runs, var_param,
+                                  fixed_n=None, fixed_k=None, c_range=None,
+                                  output_dir="results"):
+    allowed = {"solve_two_branches_smallest_wi", "solve_two_branches_biggest_wi"}
+    filtered = {alg: res for alg, res in results_by_alg.items() if alg in allowed}
+    if not filtered:
+        print("No branch algorithms found for plot_branch_perf_vs_guarantee.")
+        return
+
+    xlabel_map = {
+        "n": r"Number of items $n$",
+        "k": r"Number of scenarios $k$",
+        "p": r"Number of items to select $p$"
+    }
+
+    label_map = {
+        "solve_two_branches_smallest_wi": r"Branch on smallest $w_i$",
+        "solve_two_branches_biggest_wi": r"Branch on biggest $w_i$",
+    }
+
+    for alg, all_results in filtered.items():
+        param_suffix = f"_{var_param}" if var_param in {"n", "k", "p"} else ""
+        output_plot = f"{output_dir}/plot_branch_perf_and_guarantee_{alg}{param_suffix}.png"
+
+        per_param_G = {}
+        per_param_R = {}
+        for entry in all_results:
+            param = entry["varying_param"]
+            ratio = entry.get("ratio_alg_opt", math.nan)
+            G = entry.get("approximation_guarantee", math.nan)
+            per_param_G.setdefault(param, []).append(G)
+            per_param_R.setdefault(param, []).append(ratio)
+
+        param_values = sorted(per_param_G.keys())
+        if not param_values:
+            print(f"No x-values for {alg} in plot_branch_perf_vs_guarantee.")
+            continue
+
+        avg_G = [safe_mean(per_param_G[p]) for p in param_values]
+        ci_G  = [safe_ci95(per_param_G[p]) for p in param_values]
+        avg_R = [safe_mean(per_param_R[p]) for p in param_values]
+        ci_R  = [safe_ci95(per_param_R[p]) for p in param_values]
+
+        fig = plt.figure()
+        color = COL.get(alg, "black")
+
+        plt.errorbar(
+            param_values, avg_G, yerr=ci_G, capsize=5,
+            linestyle="-", marker="o",
+            color=color,
+            label=rf"{label_map.get(alg, alg)} guarantee $1/t$ (Ø $\pm$ 95\% CI)"
+        )
+
+        plt.errorbar(
+            param_values, avg_R, yerr=ci_R, capsize=5,
+            linestyle="--", marker="s",
+            color=color,
+            label=rf"{label_map.get(alg, alg)} performance $\mathrm{{ALG}}/\mathrm{{OPT}}_\mathrm{{IP}}$ (Ø $\pm$ 95\% CI)"
+        )
+
+        plt.xlabel(xlabel_map.get(var_param, ""))
+        plt.ylabel(r"Approximation guarantee / ratio")
+
+        any_res = all_results
+        p_label = any_res[0].get("p_label", "") if any_res else ""
+        subtitle = (
+            r"(Average over " + str(num_runs) + r" runs $\mid$ "
+            + (r"$n$=" + str(fixed_n) + ", " if var_param != "n" and fixed_n is not None else "")
+            + (r"$p$=" + p_label + ", " if var_param != "p" and p_label else "")
+            + (r"$k$=" + str(fixed_k) + ", " if var_param != "k" and fixed_k is not None else "")
+            + r"cost range: [1, " + str(c_range) + "])"
+        )
+        plt.title(subtitle)
+        plt.xticks(param_values, rotation=45, ha='right', rotation_mode='anchor')
+        plt.legend()
+        plt.tight_layout()
+        plt.savefig(output_plot, bbox_inches="tight")
+        plt.close(fig)
+        print(f"Branch perf-and-guarantee plot saved to {output_plot}")
+

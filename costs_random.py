@@ -32,7 +32,7 @@ elif var_param == "k":
 elif var_param == "p":
     fixed_n = 70
     fixed_k = 5
-    var_values = list(range(2, fixed_n, 2))  # p in steps of 2 from 2 to n-2
+    var_values = [1] + list(range(2, fixed_n, 2))  # p in steps of 2 from 2 to n-2 (plus 1)
 num_runs = 100
 c_range = 100
 
