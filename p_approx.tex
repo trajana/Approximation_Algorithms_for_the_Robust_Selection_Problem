@@ -1,0 +1,48 @@
+\documentclass[abstracton]{scrartcl}
+
+\usepackage[a4paper, total={15.5cm, 23cm}]{geometry}
+
+
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amssymb}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{cor}[theorem]{Corollary}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+
+\newcommand{\cU}{\mathcal{U}}
+\newcommand{\X}{\mathcal{X}}
+\newcommand{\conv}{\textup{conv}}
+
+\title{Worst-case-per-item for Min-Max Selection is p-Approximation}
+\date{}
+
+\begin{document}
+	
+	\maketitle
+	
+	Grundidee:
+	\begin{itemize}
+		\item Für jedes Item \(i\) gilt: \(c_i' = \max_{s \in [K]} c_i^s \le OPT\), falls \(x_i^* = 1\).
+		\item Die optimale Lösung \(x^*\) wählt genau \(p\) Items.
+	\end{itemize}
+	
+	Formally:
+	
+	\[
+	\max_{s \in [K]} \sum_{i=1}^{n} c_i^s x_i'
+	\le
+	\sum_{i=1}^{n} c_i' x_i'
+	\le
+	\sum_{i=1}^{n} c_i' x_i^*
+	\le
+	p \cdot \max_{s \in [K]} \sum_{i=1}^{n} c_i^s x_i^* .
+	\]
+	
+	(Weil \(p<=n\) auch automatisch \(n\)-Approx.)
+
+\end{document}

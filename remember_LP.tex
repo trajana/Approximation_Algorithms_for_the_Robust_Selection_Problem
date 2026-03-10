@@ -1,0 +1,188 @@
+\documentclass[abstracton]{scrartcl}
+
+\usepackage[a4paper, total={15.5cm, 23cm}]{geometry}
+
+
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amssymb}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{cor}[theorem]{Corollary}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+
+\newcommand{\cU}{\mathcal{U}}
+\newcommand{\X}{\mathcal{X}}
+\newcommand{\conv}{\textup{conv}}
+
+\title{Remember LP}
+\date{}
+
+\begin{document}
+	
+\maketitle
+	
+Ursprüngliches Problem:
+
+\begin{align}
+	\min\; & t \label{eq:mirror-obj}\\[1mm]
+	\text{s.t.}\quad
+	& \max_{s\in[k]} \sum_{i\in\mathcal{S}(w)} c_i^s
+	\;\le\;
+	t \sum_{i\in\mathcal{S}(w)} w_i,
+	\label{eq:mirror-i}
+	\\[1mm]
+	& \sum_{i\in\mathcal{S}(w)} w_i
+	\;\le\;
+	\mathrm{OPT}_{\mathrm{dual}} .
+	\label{eq:mirror-ii}
+\end{align}
+	
+Bedingungen ersetzt durch sufficient constraints:
+\begin{alignat}{3}
+	\max \quad & t \\[1mm]
+	\text{s.t.}\quad
+	& t \sum_{i\in\mathcal S} c_i^s \;\le\; \sum_{i\in\mathcal S} w_i
+	&& \forall s\in[k],\ \forall \mathcal S\subseteq[n]:|\mathcal S|=p, \label{eq:pd-lp-i}\\[1mm]
+	& \sum_{i\in\mathcal{S}(w)} w_i \;\le\; p\,\alpha - \sum_{i=1}^n \gamma_i, \label{eq:pd-lp-ii}\\[1mm]
+	& \alpha - \sum_{s=1}^k c_i^s \beta_s \;\le\; \gamma_i
+	&& \forall i\in[n], \label{eq:pd-lp-dualfeas}\\[1mm]
+	& w_i \;=\; \sum_{s=1}^k \beta_s c_i^s
+	&& \forall i\in[n], \label{eq:pd-lp-w}\\[1mm]
+	& \sum_{s=1}^k \beta_s = 1,\quad \beta_s \ge 0
+	&& \forall s\in[k], \label{eq:pd-lp-simplex}\\[2mm]
+	& \gamma_i \ge 0 && \forall i\in[n], \qquad \alpha\in\mathbb{R}. \label{eq:pd-lp-sign}
+\end{alignat}
+
+Nach Dualem Ersatz und zeigen, dass 6 \& 7 immer erfüllt werden können:
+
+\begin{alignat}{3}
+	\label{lp:compact}
+	\max \quad & t \\[1mm]
+	\text{s.t.}\quad
+	& w_i \;=\; \sum_{s=1}^k \beta_s\, c_i^s
+	&& \forall i\in[n], \label{lp:compact-w}\\[1mm]
+	& \sum_{s=1}^k \beta_s \;=\; 1 \label{lp:compact-simplex}\\[2mm]
+	& p\,\alpha_s \;-\; \sum_{i=1}^n \lambda^s_i \;\ge\; 0
+	&& \forall s\in[k], \label{lp:compact-dual1}\\[1mm]
+	& \lambda^s_i \;\ge\; \alpha_s - w_i + t\,c_i^s
+	&& \forall s\in[k],\ \forall i\in[n], \label{lp:compact-dual2}\\[1mm]
+	& \lambda^s_i \ge 0
+	&& \forall s\in[k],\ \forall i\in[n], \label{lp:compact-dual3}\\[1mm]
+	& t \ge 0,\quad \alpha_s \in \mathbb{R},\quad \beta_s \ge 0
+	&& \forall s\in[k]. \label{lp:compact-sign}
+\end{alignat}
+
+"Remember" LP (Teil der Items fixiert):
+
+\begin{alignat}{3}
+	\label{lp:compact-remember}
+	\max \quad & t \\[1mm]
+	\text{s.t.}\quad
+	& w_i \;=\; \sum_{s=1}^k \beta_s\, c_i^s
+	&& \forall i\in R, \label{lp:remember-w}\\[1mm]
+	& \sum_{s=1}^k \beta_s \;=\; 1
+	&& \label{lp:remember-simplex}\\[2mm]
+	& p_{\mathrm{rem}}\,\alpha_s \;-\; \sum_{i\in R} \lambda^s_i
+	\;+\; \sum_{s=1}^k \beta_s \sum_{i\in F} c_i^s
+	\;-\; t \sum_{i\in F} c_i^s \;\ge\; 0
+	&& \forall s\in[k], \label{lp:remember-dual1}\\[1mm]
+	& \lambda^s_i \;\ge\; \alpha_s - w_i + t\,c_i^s
+	&& \forall s\in[k],\ \forall i\in R, \label{lp:remember-dual2}\\[1mm]
+	& \lambda^s_i \;\ge\; 0
+	&& \forall s\in[k],\ \forall i\in R, \label{lp:remember-dual3}\\[1mm]
+	& t \;\ge\; 0,\quad \alpha_s \in \mathbb{R},\quad \beta_s \;\ge\; 0
+	&& \forall s\in[k]. \label{lp:remember-sign}
+\end{alignat}
+
+Herleitung:
+
+\begin{itemize}
+	\item Menge $F$ von Items fix gewählt; wir müssen nur noch
+	$p_{\mathrm{rem}} = p - |F|$ weitere Items aus  Restpool $R$ wählen
+	
+	\item Die Bedingung (5) soll jetzt für die vollständige Menge 
+	$F \cup T$ ($T \subseteq R$)gelten
+	\[
+	t \sum_{i\in F\cup T} c_i^s \;\le\; \sum_{i\in F\cup T} w_i.
+	\]
+	
+	\item Festen und variablen Teil trennen
+	\[
+	\sum_{i\in T} (w_i - t c_i^s)
+	\;\ge\;
+	- \sum_{i\in F} (w_i - t c_i^s).
+	\]
+	
+	\item Dann definieren wir
+	\[
+	d_i^s := w_i - t c_i^s \qquad (i\in R).
+	\]
+	Dann lautet die Bedingung äquivalent:
+	\[
+	\sum_{i\in T} d_i^s \;\ge\; 
+	 - \sum_{i\in F}(w_i - t c_i^s)
+	\qquad\forall T\subseteq R,\ |T| = p_{\mathrm{rem}}.
+	\]
+	
+	\item wir betrachten dieses selection-problem:
+	\[
+	\min\Bigl\{\sum_{i\in R} d_i^s x_i : 
+	\sum_{i\in R} x_i = p_{\mathrm{rem}},\ x_i\ge 0 \Bigr\}.
+	\]
+	TU, daher entspricht der Optimalwert exakt
+	dem diskreten Minimum.
+	
+	\item Das Dual:
+	\[
+	\max\Bigl\{
+	p_{\mathrm{rem}}\alpha_s - \sum_{i\in R} \lambda_i^s :
+	\alpha_s - \lambda_i^s \ge d_i^s,\ \lambda_i^s\ge 0
+	\Bigr\}.
+	\]
+	
+	\item Nach starker Dualität gilt die Bedingung genau dann, wenn
+	der Dualwert mindestens $- \sum_{i\in F}(w_i - t c_i^s)$ ist:
+	\[
+	p_{\mathrm{rem}}\alpha_s - \sum_{i\in R} \lambda_i^s \;\ge\; - \sum_{i\in F}(w_i - t c_i^s).
+	\]
+	
+	\item also
+	\[
+	p_{\mathrm{rem}}\alpha_s - \sum_{i\in R} \lambda_i^s
+	+ \sum_{i\in F} w_i - t \sum_{i\in F} c_i^s \;\ge\; 0.
+	\]
+	
+	\item Da für alle Items (insbesondere für $i\in F$) gilt
+	\[
+	w_i = \sum_{s=1}^k \beta_s c_i^s,
+	\]
+	können wir die Summe über feste Items ausdrücken als
+	\[
+	\sum_{i\in F} w_i
+	= \sum_{s=1}^k \beta_s \sum_{i\in F} c_i^s.
+	\]
+	
+	\item Damit ergibt sich die Remember-Bedingung
+	\[
+	p_{\mathrm{rem}} \alpha_s
+	- \sum_{i\in R} \lambda_i^s
+	+ \sum_{s=1}^k \beta_s \sum_{i\in F} c_i^s
+	- t \sum_{i\in F} c_i^s
+	\;\ge\; 0.
+	\]
+	
+	\item Da $\sum_{i\in F} w_i = \sum_{s=1}^k \beta_s \sum_{i\in F} c_i^s$
+	gilt, müssen wir für feste Items keine eigenen Variablen $w_i$ einführen.
+	
+	\item Alle übrigen Bedingungen des LP bleiben unverändert;. Nur die Indexmengen werden von $[n]$ auf $R$ reduziert.
+\end{itemize}
+
+
+
+
+
+\end{document}

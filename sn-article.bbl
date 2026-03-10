@@ -1,0 +1,409 @@
+%% BioMed_Central_Bib_Style_v1.01
+
+\begin{thebibliography}{23}
+% BibTex style file: bmc-mathphys.bst (version 2.1), 2014-07-24
+\ifx \bisbn   \undefined \def \bisbn  #1{ISBN #1}\fi
+\ifx \binits  \undefined \def \binits#1{#1}\fi
+\ifx \bauthor  \undefined \def \bauthor#1{#1}\fi
+\ifx \batitle  \undefined \def \batitle#1{#1}\fi
+\ifx \bjtitle  \undefined \def \bjtitle#1{#1}\fi
+\ifx \bvolume  \undefined \def \bvolume#1{\textbf{#1}}\fi
+\ifx \byear  \undefined \def \byear#1{#1}\fi
+\ifx \bissue  \undefined \def \bissue#1{#1}\fi
+\ifx \bfpage  \undefined \def \bfpage#1{#1}\fi
+\ifx \blpage  \undefined \def \blpage #1{#1}\fi
+\ifx \burl  \undefined \def \burl#1{\textsf{#1}}\fi
+\ifx \doiurl  \undefined \def \doiurl#1{\url{https://doi.org/#1}}\fi
+\ifx \betal  \undefined \def \betal{\textit{et al.}}\fi
+\ifx \binstitute  \undefined \def \binstitute#1{#1}\fi
+\ifx \binstitutionaled  \undefined \def \binstitutionaled#1{#1}\fi
+\ifx \bctitle  \undefined \def \bctitle#1{#1}\fi
+\ifx \beditor  \undefined \def \beditor#1{#1}\fi
+\ifx \bpublisher  \undefined \def \bpublisher#1{#1}\fi
+\ifx \bbtitle  \undefined \def \bbtitle#1{#1}\fi
+\ifx \bedition  \undefined \def \bedition#1{#1}\fi
+\ifx \bseriesno  \undefined \def \bseriesno#1{#1}\fi
+\ifx \blocation  \undefined \def \blocation#1{#1}\fi
+\ifx \bsertitle  \undefined \def \bsertitle#1{#1}\fi
+\ifx \bsnm \undefined \def \bsnm#1{#1}\fi
+\ifx \bsuffix \undefined \def \bsuffix#1{#1}\fi
+\ifx \bparticle \undefined \def \bparticle#1{#1}\fi
+\ifx \barticle \undefined \def \barticle#1{#1}\fi
+\bibcommenthead
+\ifx \bconfdate \undefined \def \bconfdate #1{#1}\fi
+\ifx \botherref \undefined \def \botherref #1{#1}\fi
+\ifx \url \undefined \def \url#1{\textsf{#1}}\fi
+\ifx \bchapter \undefined \def \bchapter#1{#1}\fi
+\ifx \bbook \undefined \def \bbook#1{#1}\fi
+\ifx \bcomment \undefined \def \bcomment#1{#1}\fi
+\ifx \oauthor \undefined \def \oauthor#1{#1}\fi
+\ifx \citeauthoryear \undefined \def \citeauthoryear#1{#1}\fi
+\ifx \endbibitem  \undefined \def \endbibitem {}\fi
+\ifx \bconflocation  \undefined \def \bconflocation#1{#1}\fi
+\ifx \arxivurl  \undefined \def \arxivurl#1{\textsf{#1}}\fi
+\csname PreBibitemsHook\endcsname
+
+%%% 1
+\bibitem[\protect\citeauthoryear{Nocedal and Wright}{2006}]{Nocedal2006}
+\begin{bbook}
+\bauthor{\bsnm{Nocedal}, \binits{J.}},
+\bauthor{\bsnm{Wright}, \binits{S.J.}}:
+\bbtitle{Numerical Optimization},
+\bedition{2}nd edn.
+\bpublisher{Springer},
+\blocation{New York}
+(\byear{2006}).
+\doiurl{10.1007/978-0-387-40065-5}
+\end{bbook}
+\endbibitem
+
+%%% 2
+\bibitem[\protect\citeauthoryear{Li et~al.}{2024}]{Li2024}
+\begin{bbook}
+\bauthor{\bsnm{Li}, \binits{C.}},
+\bauthor{\bsnm{Han}, \binits{S.}},
+\bauthor{\bsnm{Zeng}, \binits{S.}},
+\bauthor{\bsnm{Yang}, \binits{S.}}:
+\bbtitle{Intelligent Optimization: Principles, Algorithms and Applications}.
+\bpublisher{Springer},
+\blocation{Singapore}
+(\byear{2024}).
+\doiurl{10.1007/978-981-97-3286-9}
+\end{bbook}
+\endbibitem
+
+%%% 3
+\bibitem[\protect\citeauthoryear{Ben-Tal et~al.}{2009}]{BenTal2009}
+\begin{bbook}
+\bauthor{\bsnm{Ben-Tal}, \binits{A.}},
+\bauthor{\bsnm{Ghaoui}, \binits{L.E.}},
+\bauthor{\bsnm{Nemirovski}, \binits{A.}}:
+\bbtitle{Robust Optimization}.
+\bpublisher{Princeton University Press},
+\blocation{Princeton}
+(\byear{2009})
+\end{bbook}
+\endbibitem
+
+%%% 4
+\bibitem[\protect\citeauthoryear{Aissi et~al.}{2009}]{Aissi2009}
+\begin{barticle}
+\bauthor{\bsnm{Aissi}, \binits{H.}},
+\bauthor{\bsnm{Bazgan}, \binits{C.}},
+\bauthor{\bsnm{Vanderpooten}, \binits{D.}}:
+\batitle{Min–max and min–max regret versions of combinatorial optimization
+  problems: A survey}.
+\bjtitle{European Journal of Operational Research}
+\bvolume{197}(\bissue{2}),
+\bfpage{427}--\blpage{438}
+(\byear{2009})
+\doiurl{10.1016/j.ejor.2008.09.012}
+\end{barticle}
+\endbibitem
+
+%%% 5
+\bibitem[\protect\citeauthoryear{Kasperski and
+  Zieli{\'n}ski}{2016}]{Kasperski2016}
+\begin{bchapter}
+\bauthor{\bsnm{Kasperski}, \binits{A.}},
+\bauthor{\bsnm{Zieli{\'n}ski}, \binits{P.}}:
+\bctitle{Robust discrete optimization under discrete and interval uncertainty:
+  A survey}.
+In: \beditor{\bsnm{Doumpos}, \binits{M.}},
+\beditor{\bsnm{Zopounidis}, \binits{C.}},
+\beditor{\bsnm{Grigoroudis}, \binits{E.}} (eds.)
+\bbtitle{Robustness Analysis in Decision Aiding, Optimization, and Analytics}
+vol. \bseriesno{241},
+pp. \bfpage{113}--\blpage{140}.
+\bpublisher{Springer},
+\blocation{Cham}
+(\byear{2016}).
+\doiurl{10.1007/978-3-319-33121-8_6}
+\end{bchapter}
+\endbibitem
+
+%%% 6
+\bibitem[\protect\citeauthoryear{Goerigk and Hartisch}{2024}]{Goerigk2024}
+\begin{bbook}
+\bauthor{\bsnm{Goerigk}, \binits{M.}},
+\bauthor{\bsnm{Hartisch}, \binits{M.}}:
+\bbtitle{An Introduction to Robust Combinatorial Optimization: Concepts, Models
+  and Algorithms for Decision Making Under Uncertainty}.
+\bpublisher{Springer},
+\blocation{Cham}
+(\byear{2024}).
+\doiurl{10.1007/978-3-031-61261-9}
+\end{bbook}
+\endbibitem
+
+%%% 7
+\bibitem[\protect\citeauthoryear{Williamson and Shmoys}{2011}]{Williamson2011}
+\begin{bbook}
+\bauthor{\bsnm{Williamson}, \binits{D.P.}},
+\bauthor{\bsnm{Shmoys}, \binits{D.B.}}:
+\bbtitle{The Design of Approximation Algorithms}.
+\bpublisher{Cambridge University Press},
+\blocation{Cambridge}
+(\byear{2011}).
+\doiurl{10.1017/CBO9780511921735}
+\end{bbook}
+\endbibitem
+
+%%% 8
+\bibitem[\protect\citeauthoryear{Papadimitriou and
+  Steiglitz}{1998}]{Papadimitriou1998}
+\begin{bbook}
+\bauthor{\bsnm{Papadimitriou}, \binits{C.H.}},
+\bauthor{\bsnm{Steiglitz}, \binits{K.}}:
+\bbtitle{Combinatorial Optimization: Algorithms and Complexity}.
+\bpublisher{Dover},
+\blocation{New York}
+(\byear{1998})
+\end{bbook}
+\endbibitem
+
+%%% 9
+\bibitem[\protect\citeauthoryear{Kasperski et~al.}{2013}]{Kasperski2013}
+\begin{barticle}
+\bauthor{\bsnm{Kasperski}, \binits{A.}},
+\bauthor{\bsnm{Kurpisz}, \binits{A.}},
+\bauthor{\bsnm{Zieliński}, \binits{P.}}:
+\batitle{Approximating the min–max (regret) selecting items problem}.
+\bjtitle{Information Processing Letters}
+\bvolume{113}(\bissue{1}),
+\bfpage{23}--\blpage{29}
+(\byear{2013})
+\doiurl{10.1016/j.ipl.2012.10.001}
+\end{barticle}
+\endbibitem
+
+%%% 10
+\bibitem[\protect\citeauthoryear{Averbakh}{2001}]{Averbakh2001}
+\begin{barticle}
+\bauthor{\bsnm{Averbakh}, \binits{I.}}:
+\batitle{On the complexity of a class of combinatorial optimization problems
+  with uncertainty}.
+\bjtitle{Mathem. Program.}
+\bvolume{90}(\bissue{2}),
+\bfpage{263}--\blpage{272}
+(\byear{2001})
+\doiurl{10.1007/PL00011424}
+\end{barticle}
+\endbibitem
+
+%%% 11
+\bibitem[\protect\citeauthoryear{Papadimitriou and
+  Yannakakis}{2000}]{Papadimitriou2000}
+\begin{bchapter}
+\bauthor{\bsnm{Papadimitriou}, \binits{C.H.}},
+\bauthor{\bsnm{Yannakakis}, \binits{M.}}:
+\bctitle{On the approximability of trade-offs and optimal access of web
+  sources}.
+In: \bbtitle{Proceedings of the 41st Annual Symposium on Foundations of
+  Computer Science (FOCS)},
+pp. \bfpage{86}--\blpage{92}.
+\bpublisher{IEEE},
+\blocation{New York}
+(\byear{2000}).
+\doiurl{10.1109/SFCS.2000.892068}
+\end{bchapter}
+\endbibitem
+
+%%% 12
+\bibitem[\protect\citeauthoryear{Aissi et~al.}{2006}]{Aissi2006}
+\begin{bchapter}
+\bauthor{\bsnm{Aissi}, \binits{H.}},
+\bauthor{\bsnm{Bazgan}, \binits{C.}},
+\bauthor{\bsnm{Vanderpooten}, \binits{D.}}:
+\bctitle{Approximating min--max (regret) versions of some polynomial problems}.
+In: \beditor{\bsnm{Chen}, \binits{D.Z.}},
+\beditor{\bsnm{Lee}, \binits{D.T.}} (eds.)
+\bbtitle{Proceedings of the 12th Annual International Computing and
+  Combinatorics Conference (COCOON 2006)}.
+\bsertitle{Lecture Notes in Computer Science},
+vol. \bseriesno{4112},
+pp. \bfpage{428}--\blpage{438}.
+\bpublisher{Springer},
+\blocation{Berlin}
+(\byear{2006})
+\end{bchapter}
+\endbibitem
+
+%%% 13
+\bibitem[\protect\citeauthoryear{Kasperski and
+  Zieliński}{2009}]{Kasperski2009}
+\begin{barticle}
+\bauthor{\bsnm{Kasperski}, \binits{A.}},
+\bauthor{\bsnm{Zieliński}, \binits{P.}}:
+\batitle{A randomized algorithm for the min-max selecting items problem with
+  uncertain weights}.
+\bjtitle{Ann Oper Res}
+\bvolume{172}(\bissue{1}),
+\bfpage{221}--\blpage{230}
+(\byear{2009})
+\doiurl{10.1007/s10479-009-0564-x}
+\end{barticle}
+\endbibitem
+
+%%% 14
+\bibitem[\protect\citeauthoryear{Goerigk and Hughes}{2019}]{Goerigk2019}
+\begin{barticle}
+\bauthor{\bsnm{Goerigk}, \binits{M.}},
+\bauthor{\bsnm{Hughes}, \binits{M.}}:
+\batitle{Representative scenario construction and preprocessing for robust
+  combinatorial optimization problems}.
+\bjtitle{Optim Lett}
+\bvolume{13}(\bissue{6}),
+\bfpage{1417}--\blpage{1431}
+(\byear{2019})
+\doiurl{10.1007/s11590-018-1348-5}
+\end{barticle}
+\endbibitem
+
+%%% 15
+\bibitem[\protect\citeauthoryear{Chassein and Goerigk}{2018}]{Chassein2018}
+\begin{barticle}
+\bauthor{\bsnm{Chassein}, \binits{A.}},
+\bauthor{\bsnm{Goerigk}, \binits{M.}}:
+\batitle{On scenario aggregation to approximate robust combinatorial
+  optimization problems}.
+\bjtitle{Optim Lett}
+\bvolume{12}(\bissue{7}),
+\bfpage{1523}--\blpage{1533}
+(\byear{2018})
+\doiurl{10.1007/s11590-017-1206-x}
+\end{barticle}
+\endbibitem
+
+%%% 16
+\bibitem[\protect\citeauthoryear{Doerr}{2013}]{Doerr2013}
+\begin{barticle}
+\bauthor{\bsnm{Doerr}, \binits{B.}}:
+\batitle{Improved approximation algorithms for the min–max selecting items
+  problem}.
+\bjtitle{Information Processing Letters}
+\bvolume{113}(\bissue{19}),
+\bfpage{747}--\blpage{749}
+(\byear{2013})
+\doiurl{10.1016/j.ipl.2013.07.011}
+\end{barticle}
+\endbibitem
+
+%%% 17
+\bibitem[\protect\citeauthoryear{Karmarkar}{1984}]{Karmarkar1984}
+\begin{barticle}
+\bauthor{\bsnm{Karmarkar}, \binits{N.}}:
+\batitle{A new polynomial–time algorithm for linear programming}.
+\bjtitle{Combinatorica}
+\bvolume{4}(\bissue{4}),
+\bfpage{373}--\blpage{395}
+(\byear{1984})
+\doiurl{10.1007/BF02579150}
+\end{barticle}
+\endbibitem
+
+%%% 18
+\bibitem[\protect\citeauthoryear{Karp}{1972}]{Karp1972}
+\begin{bchapter}
+\bauthor{\bsnm{Karp}, \binits{R.M.}}:
+\bctitle{Reducibility among combinatorial problems}.
+In: \beditor{\bsnm{Miller}, \binits{R.E.}},
+\beditor{\bsnm{Thatcher}, \binits{J.W.}},
+\beditor{\bsnm{Bohlinger}, \binits{J.D.}} (eds.)
+\bbtitle{Complexity of Computer Computations},
+pp. \bfpage{85}--\blpage{103}.
+\bpublisher{Springer},
+\blocation{Boston}
+(\byear{1972}).
+\doiurl{10.1007/978-1-4684-2001-2_9}
+\end{bchapter}
+\endbibitem
+
+%%% 19
+\bibitem[\protect\citeauthoryear{Garey and Johnson}{1979}]{Garey1979}
+\begin{bbook}
+\bauthor{\bsnm{Garey}, \binits{M.R.}},
+\bauthor{\bsnm{Johnson}, \binits{D.S.}}:
+\bbtitle{Computers and Intractability: A Guide to the Theory of
+  NP-Completeness}.
+\bpublisher{W. H. Freeman},
+\blocation{New York}
+(\byear{1979})
+\end{bbook}
+\endbibitem
+
+%%% 20
+\bibitem[\protect\citeauthoryear{Gurobi~Optimization}{2025}]{gurobi2025}
+\begin{botherref}
+\oauthor{\bsnm{Gurobi~Optimization}, \binits{L.}}:
+Gurobi Optimizer Reference Manual.
+Accessed: 14 August 2025.
+\url{https://docs.gurobi.com/current/}
+\end{botherref}
+\endbibitem
+
+%%% 21
+\bibitem[\protect\citeauthoryear{Harris et~al.}{2020}]{harris2020}
+\begin{barticle}
+\bauthor{\bsnm{Harris}, \binits{C.R.}},
+\bauthor{\bsnm{Millman}, \binits{K.J.}},
+\bauthor{\bsnm{Walt}, \binits{S.J.}},
+\bauthor{\bsnm{Gommers}, \binits{R.}},
+\bauthor{\bsnm{Virtanen}, \binits{P.}},
+\bauthor{\bsnm{Cournapeau}, \binits{D.}},
+\bauthor{\bsnm{Wieser}, \binits{E.}},
+\bauthor{\bsnm{Taylor}, \binits{J.}},
+\bauthor{\bsnm{Berg}, \binits{S.}},
+\bauthor{\bsnm{Smith}, \binits{N.J.}},
+\bauthor{\bsnm{Kern}, \binits{R.}},
+\bauthor{\bsnm{Picus}, \binits{M.}},
+\bauthor{\bsnm{Hoyer}, \binits{S.}},
+\bauthor{\bsnm{Kerkwijk}, \binits{M.H.}},
+\bauthor{\bsnm{Brett}, \binits{M.}},
+\bauthor{\bsnm{Haldane}, \binits{A.}},
+\bauthor{\bsnm{R{\'i}o}, \binits{J.}},
+\bauthor{\bsnm{Wiebe}, \binits{M.}},
+\bauthor{\bsnm{Peterson}, \binits{P.}},
+\bauthor{\bsnm{G{\'e}rard-Marchant}, \binits{P.}},
+\bauthor{\bsnm{Sheppard}, \binits{K.}},
+\bauthor{\bsnm{Reddy}, \binits{T.}},
+\bauthor{\bsnm{Weckesser}, \binits{W.}},
+\bauthor{\bsnm{Abbasi}, \binits{H.}},
+\bauthor{\bsnm{Gohlke}, \binits{C.}},
+\bauthor{\bsnm{Oliphant}, \binits{T.E.}}:
+\batitle{Array programming with numpy}.
+\bjtitle{Nature}
+\bvolume{585}(\bissue{7825}),
+\bfpage{357}--\blpage{362}
+(\byear{2020})
+\doiurl{10.1038/s41586-020-2649-2}
+\end{barticle}
+\endbibitem
+
+%%% 22
+\bibitem[\protect\citeauthoryear{Hunter}{2007}]{hunter2007}
+\begin{barticle}
+\bauthor{\bsnm{Hunter}, \binits{J.D.}}:
+\batitle{Matplotlib: A 2d graphics environment}.
+\bjtitle{Computing in Science \& Engineering}
+\bvolume{9}(\bissue{3}),
+\bfpage{90}--\blpage{95}
+(\byear{2007})
+\doiurl{10.1109/MCSE.2007.55}
+\end{barticle}
+\endbibitem
+
+%%% 23
+\bibitem[\protect\citeauthoryear{DeGroot and Schervish}{2012}]{DeGroot2012}
+\begin{bbook}
+\bauthor{\bsnm{DeGroot}, \binits{M.H.}},
+\bauthor{\bsnm{Schervish}, \binits{M.J.}}:
+\bbtitle{Probability and Statistics},
+\bedition{4th} edn.
+\bpublisher{Pearson Education, Inc.},
+\blocation{London}
+(\byear{2012})
+\end{bbook}
+\endbibitem
+
+\end{thebibliography}
