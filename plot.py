@@ -52,6 +52,8 @@ COL = {
     "opt_w_n_remember_rob_obj": "#663399",
     "solve_two_branches_smallest_wi": "#770000",
     "solve_two_branches_biggest_wi": "#AA5500",
+    "primal_branching": "#778800",
+    "doerr_rr": "#550011"
 }
 
 
@@ -67,6 +69,8 @@ STYLE = {
     "opt_w_n_remember_rob_obj": dict(linestyle="--", marker="p"),
     "solve_two_branches_smallest_wi": dict(linestyle="--", marker="<"),
     "solve_two_branches_biggest_wi": dict(linestyle="-", marker="v"),
+    "primal_branching": dict(linestyle=":", marker="v"),
+    "doerr_rr": dict(linestyle="-",  marker="o"),
 }
 
 
@@ -111,6 +115,8 @@ def plot_approx_ratio_only(all_results, num_runs, var_param, fixed_n=None, fixed
         "opt_w_n_remember_rob_obj": r"Solve LP n times each step (remember, min robust obj)",
         "solve_two_branches_smallest_wi": r"Solve LP pick smallest wi - branch",
         "solve_two_branches_biggest_wi": r"Solve LP pick biggest wi - branch",
+        "primal_branching": r"Primal Rounding - branch",
+        "doerr_rr": r"Randomized Rounding",
     }
     base_label = label_map.get(alg_key, alg_key)
     method_label = rf"{base_label} $\mathrm{{ALG}} / \mathrm{{OPT}}_\mathrm{{IP}}$"
@@ -180,6 +186,8 @@ def plot_ratio_comp(results_by_alg, num_runs, var_param, fixed_n=None, fixed_k=N
         "opt_w_n_remember_rob_obj": r"Solve LP n times each step (remember, min robust obj)",
         "solve_two_branches_smallest_wi": r"Solve LP pick smallest wi - branch",
         "solve_two_branches_biggest_wi": r"Solve LP pick biggest wi - branch",
+        "primal_branching": r"Primal Rounding - branch",
+        "doerr_rr": r"Randomized Rounding",
     }
 
     def collect_ratio_by_param(all_results):
@@ -500,7 +508,7 @@ def plot_branch_guarantees(all_results, num_runs, var_param,
 def plot_branch_perf_vs_guarantee(results_by_alg, num_runs, var_param,
                                   fixed_n=None, fixed_k=None, c_range=None,
                                   output_dir="results"):
-    allowed = {"solve_two_branches_smallest_wi", "solve_two_branches_biggest_wi"}
+    allowed = {"solve_two_branches_smallest_wi", "solve_two_branches_biggest_wi", "primal_branching"}
     filtered = {alg: res for alg, res in results_by_alg.items() if alg in allowed}
     if not filtered:
         print("No branch algorithms found for plot_branch_perf_vs_guarantee.")
@@ -515,6 +523,7 @@ def plot_branch_perf_vs_guarantee(results_by_alg, num_runs, var_param,
     label_map = {
         "solve_two_branches_smallest_wi": r"Branch on smallest $w_i$",
         "solve_two_branches_biggest_wi": r"Branch on biggest $w_i$",
+        "primal_branching": r"Primal Rounding - branch",
     }
 
     for alg, all_results in filtered.items():

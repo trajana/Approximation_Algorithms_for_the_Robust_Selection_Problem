@@ -14,13 +14,14 @@ from datetime import datetime
 from exact_solution import solve_exact_robust_selection
 from midpoint import solve_midpoint
 from worst_case_p_item import solve_worst_case_p_item
-from primal_rounding import solve_primal_rounding
+from primal_rounding import (solve_primal_rounding, solve_two_branches_biggest_xi)
 from primal_dual_rounding import solve_primal_dual_with_lp
 from dual_approach import solve_dual_approach
 from primal_dual_rounding_opt_w import (solve_opt_w_then_select_once,
-                                        solve_opt_w_then_select_adaptive_remember, solve_opt_w_ntimes_then_select_adaptive_remember,
-                                        solve_opt_w_ntimes_then_select_adaptive_remember, solve_two_branches_smallest_wi,
+                                        solve_opt_w_then_select_adaptive_remember, solve_opt_w_ntimes_then_select_adaptive_remember_rob_obj,
+                                        solve_two_branches_smallest_wi,
                                         solve_two_branches_biggest_wi)
+from randomized_rounding_doerr import solve_randomized_rounding_doerr
 from utils import (get_fixed_costs, get_random_costs, dprint_costs, cost_matrix_to_dict,
                    dprint_all_results_from_pkl)
 
@@ -28,6 +29,10 @@ ALGORITHM_DISPATCH = {
     "primal": {
         "algorithm": "Primal Rounding",
         "function": solve_primal_rounding
+    },
+    "primal_branching": {
+        "algorithm": "Primal Branching",
+        "function": solve_two_branches_biggest_xi
     },
     "primal_dual": {
         "algorithm": "Primal-Dual Rounding",
@@ -53,14 +58,14 @@ ALGORITHM_DISPATCH = {
         "algorithm": "Optimize iteratively (remember)",
         "function": solve_opt_w_then_select_adaptive_remember
     },
-    # "opt_w_n_remember_rob_obj": {
-    #     "algorithm": "Optimize n times iteratively (remember, min robust obj)",
-    #     "function": solve_opt_w_ntimes_then_select_adaptive_remember_rob_obj
-    # },
-    "opt_w_n_remember": {
-        "algorithm": "Optimize n times iteratively (remember)",
-        "function": solve_opt_w_ntimes_then_select_adaptive_remember
+    "opt_w_n_remember_rob_obj": {
+        "algorithm": "Optimize n times iteratively (remember, min robust obj)",
+        "function": solve_opt_w_ntimes_then_select_adaptive_remember_rob_obj
     },
+    # "opt_w_n_remember": {
+    #     "algorithm": "Optimize n times iteratively (remember)",
+    #     "function": solve_opt_w_ntimes_then_select_adaptive_remember
+    # },
     "solve_two_branches_smallest_wi": {
         "algorithm": "Branch by smallest wi",
         "function": solve_two_branches_smallest_wi
@@ -68,7 +73,11 @@ ALGORITHM_DISPATCH = {
     "solve_two_branches_biggest_wi": {
         "algorithm": "Branch by biggest wi",
         "function": solve_two_branches_biggest_wi
-    }
+    },
+    "doerr_rr": {
+        "algorithm": "Doerr Randomized Rounding",
+        "function": solve_randomized_rounding_doerr
+    },
 }
 
 # Pre-initialize
@@ -82,17 +91,19 @@ k: int | None = None
 
 # Base data
 ALGORITHMS = [
-    "primal", "primal_dual", "dual", "midpoint", "worst_case_p_item",
+    #"doerr_rr",
+    #"primal", "primal_dual", "dual", "midpoint", "worst_case_p_item",
     "opt_w",
-    "opt_w_remember",
+    #"opt_w_remember",
     #"opt_w_n_remember_rob_obj",
-    #"opt_w_n_remember",
-    "solve_two_branches_smallest_wi",
-    "solve_two_branches_biggest_wi"
+    ##"opt_w_n_remember",
+    #"solve_two_branches_smallest_wi",
+    #"solve_two_branches_biggest_wi",
+    #"primal_branching",
 ]
 # Choose algorithms that should be run.
 # Available: "primal_minmax", "primal_dual_minmax", "midpoint", "worst_case_p_item"
-var_param = "n"  # x-axis for the plot, can be "n" or "k" or "p"
+var_param = "p"  # x-axis for the plot, can be "n" or "k" or "p"
 if var_param == "n":
     var_values = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42, 44, 46, 48, 50, 52, 54, 56, 58, 60, 62, 64, 66, 68, 70]
     fixed_k = 5
@@ -221,7 +232,7 @@ if __name__ == "__main__":
 
                 if algorithm == "primal":
                     print("\n--- Primal Rounding min-max ---")
-                    obj_val_primal, x_val_primal_frac, x_vector_primal_rounded, obj_val_primal_lp, tau = result
+                    obj_val_primal, x_val_primal_frac, x_vector_primal_rounded, obj_val_primal_lp, tau, _ = result
                     x_vector_primal_frac = [round(val, 2) for val in x_val_primal_frac]
                     fractional_count = sum(1 for val in x_val_primal_frac if 0.0001 < val < 0.9999)
                     fractional_ratio = fractional_count / n
@@ -560,6 +571,81 @@ if __name__ == "__main__":
                         "flat_costs": flat_costs,
                     })
 
+                elif algorithm == "primal_branching":
+                    print("\n--- Primal Branching (two-branch biggest fractional x_i) ---")
+                    chosen, x_vec, obj_val_branch, info = result
+                    ratio = obj_val_branch / obj_val_exact if obj_val_exact != 0 else math.nan
+
+                    # a-posteriori: use tau_guarantee from info
+                    tau_guarantee = info.get("tau_guarantee", math.nan)
+                    a_posteriori_bound = (1.0 / tau_guarantee) if (
+                                tau_guarantee not in [0, None] and math.isfinite(tau_guarantee)) else math.nan
+
+                    all_results.append({
+                        "algorithm": algorithm,
+                        "varying_param": a,
+                        "p_label": p_label,
+                        "n": n, "p": p, "k": k, "run": run + 1,
+                        "obj_exact": obj_val_exact,
+                        "obj_val_branch": obj_val_branch,
+                        "ratio_alg_opt": ratio,
+                        "tau_guarantee": tau_guarantee,
+                        "approximation_guarantee": a_posteriori_bound,
+                        "chosen_branch": info.get("branch"),
+                        "i_star": info.get("i_star"),
+                        "x_i_star": info.get("x_i_star"),
+                        "S_in": info.get("S_in"),
+                        "S_out": info.get("S_out"),
+                        "obj_in": info.get("obj_in"),
+                        "obj_out": info.get("obj_out"),
+                        "x_vector_branch": x_vec,
+                        "chosen": chosen,
+                        "flat_costs": flat_costs,
+                    })
+
+                elif algorithm == "doerr_rr":
+                    print("\n--- Doerr Randomized Rounding (LP + Dependent RR) ---")
+                    obj_val_rr, x_val_rr_frac, C_star, info = result
+
+                    dprint(f"C_star (LP feasibility threshold): {C_star}")
+                    dprint(f"Average objective over {info.get('rr_trials')} RR trials: {obj_val_rr:.2f}")
+
+                    # Metrics calculations
+                    ratio_rr_opt = obj_val_rr / obj_val_exact if obj_val_exact != 0 else math.nan
+                    # Theoretical guarantee (Doerr): O(log k / log log k)
+                    if k is not None and k >= 3:
+                        approximation_guarantee = math.log(k) / math.log(math.log(k))
+                    else:
+                        approximation_guarantee = math.nan  # loglog not defined / meaningless
+
+                    # a-posteriori via LP threshold
+                    alg_div_Cstar = obj_val_rr / C_star if C_star not in [0, None] else math.nan
+
+                    dprint(f"Approximation ratio (ALG/OPT): {ratio_rr_opt:.2f}")
+                    dprint(f"a-posteriori (ALG/C_star): {alg_div_Cstar:.2f}")
+
+                    # Store results
+                    all_results.append({
+                        "algorithm": algorithm,
+                        "varying_param": a,
+                        "p_label": p_label,
+                        "n": n,
+                        "p": p,
+                        "k": k,
+                        "run": run + 1,
+                        "obj_exact": obj_val_exact,
+                        "obj_val_rr": obj_val_rr,
+                        "C_star": C_star,
+                        "ratio_alg_opt": ratio_rr_opt,
+                        "alg_div_Cstar": alg_div_Cstar,
+                        "approximation_guarantee": approximation_guarantee,
+                        "rr_trials": info.get("rr_trials"),
+                        "best_trial": info.get("best_trial"),
+                        "chosen_items": info.get("chosen_items"),
+                        "x_vector_rr_frac": [round(val, 4) for val in x_val_rr_frac],
+                        "flat_costs": flat_costs,
+                    })
+
         # Save results as pickle file
         with open(os.path.join(algo_result_dir, f"all_results.pkl"), "wb") as f:
             pickle.dump(all_results, f)
@@ -573,6 +659,13 @@ if __name__ == "__main__":
             from plot import (plot_approx_ratio_only) #(plot_approx_ratio_only, plot_approximation_ratios_primal, plot_approximation_ratios_primaldual, plot_fractional_variable_count)
 
             if algorithm == "primal":
+                plot_approx_ratio_only(
+                    all_results, num_runs, var_param,
+                    fixed_n=n, fixed_k=k, c_range=c_range,
+                    output_dir=algo_result_dir
+                )
+
+            elif algorithm == "doerr_rr":
                 plot_approx_ratio_only(
                     all_results, num_runs, var_param,
                     fixed_n=n, fixed_k=k, c_range=c_range,
