@@ -13,9 +13,6 @@ __pycache__/
 # generated documents
 *.pdf
 
-# generated plots
-*.png
-
 # specific files to ignore
 p_approx.tex
 remember_LP.tex
